@@ -1,0 +1,9 @@
+EVALUATE
+SUMMARIZECOLUMNS(
+    MonthlySnapshots[month],
+    "Total EAD", [Total EAD],
+    "30+ DPD Rate (%)", [DPD 30+ Rate] * 100,
+    "90+ DPD Rate (%)", [DPD 90+ Rate] * 100,
+    "ECL Proxy", [ECL Proxy]
+)
+ORDER BY MonthlySnapshots[month]

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "6767291036aebd30634f",
+  "position": {
+    "x": 1170,
+    "y": 720,
+    "z": 33,
+    "height": 300,
+    "width": 720,
+    "tabOrder": 33
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "HOW TO READ",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#182B42"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Exposure: simulated month-end balance. Cards and mix: latest selected month; trend: selected months.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "DPD: days past due. 30+ / 90+: exposure share at least 30 / 90 days late.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Buckets: 0, 30–59, 60–89 and 90+ DPD; simulation values are 0, 30, 60 or 90.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "MoM (pp): change vs previous calendar month, in percentage points; blank without prior exposure.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "SYNTHETIC DATA ONLY",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#182B42"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Segments and PD/LGD are assumed. 90+ is not validated default; the loss proxy is illustrative, not IFRS 9.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

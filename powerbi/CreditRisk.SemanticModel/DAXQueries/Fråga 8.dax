@@ -1,0 +1,17 @@
+EVALUATE
+SELECTCOLUMNS(
+    SUMMARIZECOLUMNS(
+        MonthlySnapshots[month], Loans[segment],
+        "EAD", [Total EAD],
+        "Rate30", [DPD 30+ Rate],
+        "Rate90", [DPD 90+ Rate],
+        "ECL", [ECL Proxy]
+    ),
+    "month", FORMAT(MonthlySnapshots[month], "yyyy-MM", "en-US"),
+    "segment", Loans[segment],
+    "total_ead", FORMAT([EAD], "0.0000000000", "en-US"),
+    "dpd30_rate", FORMAT([Rate30], "0.000000000000", "en-US"),
+    "dpd90_rate", FORMAT([Rate90], "0.000000000000", "en-US"),
+    "ecl_proxy", FORMAT([ECL], "0.0000000000", "en-US")
+)
+ORDER BY [month], [segment]

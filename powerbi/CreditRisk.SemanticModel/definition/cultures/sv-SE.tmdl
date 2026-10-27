@@ -1,0 +1,137 @@
+cultureInfo sv-SE
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "monthlysnapshots.dpd_30_rate": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "MonthlySnapshots",
+			          "ConceptualProperty": "DPD 30+ Rate"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "30+ delinquency": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "monthlysnapshots.dpd_90_rate__presentation": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "MonthlySnapshots",
+			          "ConceptualProperty": "DPD 90+ Rate | Presentation"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "90+ delinquency": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "monthlysnapshots.dpd_30_rate__latest_month": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "MonthlySnapshots",
+			          "ConceptualProperty": "DPD 30+ Rate | Latest Month"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "30+ delinquency": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "monthlysnapshots.ead_share_by_dpd_category__latest": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "MonthlySnapshots",
+			          "ConceptualProperty": "EAD Share by DPD Category | Latest"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Share of portfolio": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "monthlysnapshots.ead_by_dpd_category__latest": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "MonthlySnapshots",
+			          "ConceptualProperty": "EAD by DPD Category | Latest"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Exposure": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "monthlysnapshots.delinquent_ead_by_category__latest": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "MonthlySnapshots",
+			          "ConceptualProperty": "Delinquent EAD by Category | Latest"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Delayed exposure": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    }
+			  }
+			}
+		contentType: json
+

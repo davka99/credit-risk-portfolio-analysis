@@ -1,0 +1,48 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "fc8aba3f9418dc2c8f9c",
+  "position": {
+    "x": 30,
+    "y": 15,
+    "z": 1,
+    "height": 80,
+    "width": 1800,
+    "tabOrder": 1
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Delinquency & Portfolio Analysis",
+                    "textStyle": {
+                      "fontSize": "24pt",
+                      "color": "#182b42"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Synthetic portfolio · Month-end exposure weighted · 2025",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748b"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
