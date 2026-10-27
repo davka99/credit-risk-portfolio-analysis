@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "af09afcaf42356fc0d3d",
+  "position": {
+    "x": 9.8159509202453989,
+    "y": 967.85276073619627,
+    "z": 2004,
+    "height": 111.90184049079754,
+    "width": 872.638036809816,
+    "tabOrder": 2004
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "SYNTHETIC DATA ONLY | 30+ and 90+ are exposure-weighted indicators. 90+ is not a validated default rate. The loss proxy is illustrative, not IFRS 9.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

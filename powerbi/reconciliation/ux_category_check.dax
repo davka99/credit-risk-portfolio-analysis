@@ -1,0 +1,11 @@
+// Run in Power BI Desktop after opening the updated PBIP.
+// Returns actual model values; no temporary measure overrides.
+EVALUATE
+SUMMARIZECOLUMNS(
+    MonthlySnapshots[month],
+    MonthlySnapshots[DPD Category],
+    "EAD", [EAD by DPD Category | Latest],
+    "Share of portfolio", [EAD Share by DPD Category | Latest],
+    "Delayed EAD", [Delinquent EAD by Category | Latest]
+)
+ORDER BY MonthlySnapshots[month], MonthlySnapshots[DPD Category]

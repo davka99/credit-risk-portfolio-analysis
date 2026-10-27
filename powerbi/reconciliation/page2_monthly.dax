@@ -1,0 +1,11 @@
+// Run against the updated semantic model; no DEFINE MEASURE copies.
+EVALUATE
+SUMMARIZECOLUMNS(
+    MonthlySnapshots[month],
+    "Reporting Month", [Analysis Month Label],
+    "EAD latest", [Total EAD | Latest Month],
+    "30+ latest", [DPD 30+ Rate | Latest Month],
+    "90+ latest", [DPD 90+ Rate | Latest Month],
+    "Change 30+ pp", [DPD 30+ Change MoM pp]
+)
+ORDER BY MonthlySnapshots[month]

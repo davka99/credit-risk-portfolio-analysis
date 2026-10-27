@@ -1,0 +1,207 @@
+table MonthlySnapshots
+	lineageTag: f4f30a82-27ac-4acd-bd69-a0fb28bc041a
+
+	measure 'Total EAD' = ```
+			
+			        SUM(MonthlySnapshots[ead])
+			```
+		lineageTag: e7e704e5-a9dc-4b65-a158-f878499815bc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'DPD 30+ EAD' = ```
+			
+			        CALCULATE(
+			            [Total EAD],
+			            MonthlySnapshots[dpd] >= 30
+			        )
+			```
+		lineageTag: 96cdb8a2-c7d1-4d23-976a-af13cc48ff1a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'DPD 90+ EAD' = ```
+			
+			        CALCULATE(
+			            [Total EAD],
+			            MonthlySnapshots[dpd] >= 90
+			        )
+			```
+		lineageTag: e49cda4d-8156-45e5-844e-9c1c9b4c5933
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'DPD 30+ Rate' = ```
+			
+			        DIVIDE([DPD 30+ EAD], [Total EAD])
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 85f13fa6-d928-492f-ac72-33a3c547ba0d
+
+	measure 'DPD 90+ Rate' = ```
+			
+			        DIVIDE([DPD 90+ EAD], [Total EAD])
+			```
+		lineageTag: 68382259-b841-4d7a-a062-698c000ed7ae
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'ECL Proxy' = ```
+			
+			        SUMX(
+			            MonthlySnapshots,
+			            MonthlySnapshots[ead]
+			                * RELATED(Loans[pd_12m_assumed])
+			                * RELATED(Loans[lgd_assumed])
+			        )
+			```
+		lineageTag: 93a2da17-aff3-4810-9990-2361f48285a0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Latest available month under the selected month, segment and product filters.
+	measure 'Analysis Latest Month' =
+			CALCULATE(
+			    MAX(MonthlySnapshots[month]),
+			    ALLSELECTED(Loans[segment]),
+			    REMOVEFILTERS(MonthlySnapshots[dpd_bucket])
+			)
+		formatString: yyyy-MM
+		lineageTag: 7620b300-330d-42c3-9ac2-2a045f50b0a1
+
+	measure 'Analysis Month Label' =
+			VAR SelectedMonth = [Analysis Latest Month]
+			RETURN IF(ISBLANK(SelectedMonth), BLANK(), FORMAT(SelectedMonth, "MMM yyyy", "en-US"))
+		lineageTag: 7620b300-330d-42c3-9ac2-2a045f50b0a2
+
+	measure 'Total EAD | Latest Month' =
+			VAR SelectedMonth = [Analysis Latest Month]
+			RETURN IF(ISBLANK(SelectedMonth), BLANK(), CALCULATE([Total EAD], MonthlySnapshots[month] = SelectedMonth))
+		formatString: #,0.00
+		lineageTag: 7620b300-330d-42c3-9ac2-2a045f50b0a3
+
+	measure 'DPD 30+ Rate | Latest Month' =
+			VAR SelectedMonth = [Analysis Latest Month]
+			VAR Exposure = CALCULATE([Total EAD], MonthlySnapshots[month] = SelectedMonth)
+			VAR Rate = CALCULATE([DPD 30+ Rate], MonthlySnapshots[month] = SelectedMonth)
+			RETURN IF(ISBLANK(SelectedMonth) || ISBLANK(Exposure) || Exposure <= 0, BLANK(), COALESCE(Rate, 0))
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 7620b300-330d-42c3-9ac2-2a045f50b0a4
+
+	measure 'DPD 90+ Rate | Latest Month' =
+			VAR SelectedMonth = [Analysis Latest Month]
+			VAR Exposure = CALCULATE([Total EAD], MonthlySnapshots[month] = SelectedMonth)
+			VAR Rate = CALCULATE([DPD 90+ Rate], MonthlySnapshots[month] = SelectedMonth)
+			RETURN IF(ISBLANK(SelectedMonth) || ISBLANK(Exposure) || Exposure <= 0, BLANK(), COALESCE(Rate, 0))
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 7620b300-330d-42c3-9ac2-2a045f50b0a5
+
+	/// Difference in percentage points against the immediately preceding calendar month.
+	measure 'DPD 30+ Change MoM pp' =
+			VAR SelectedMonth = [Analysis Latest Month]
+			VAR PriorMonthDate = EDATE(SelectedMonth, -1)
+			VAR CurrentExposure = [Total EAD | Latest Month]
+			VAR CurrentRate = [DPD 30+ Rate | Latest Month]
+			VAR PreviousExposure = CALCULATE([Total EAD], REMOVEFILTERS(MonthlySnapshots[month]), MonthlySnapshots[month] = PriorMonthDate)
+			VAR PreviousRate = CALCULATE([DPD 30+ Rate], REMOVEFILTERS(MonthlySnapshots[month]), MonthlySnapshots[month] = PriorMonthDate)
+			RETURN IF(ISBLANK(SelectedMonth) || ISBLANK(CurrentExposure) || CurrentExposure <= 0 || ISBLANK(PreviousExposure) || PreviousExposure <= 0, BLANK(), 100 * (CurrentRate - COALESCE(PreviousRate, 0)))
+		formatString: +0.00;-0.00;0.00
+		lineageTag: 7620b300-330d-42c3-9ac2-2a045f50b0a6
+
+	/// Presentation-only: the existing 90+ measure with percentage formatting.
+	measure 'DPD 90+ Rate | Presentation' = [DPD 90+ Rate]
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 76f3ac11-0c08-4b40-ac49-f64900000001
+
+	/// Exposure for the category at the selected portfolio's latest month.
+	measure 'EAD by DPD Category | Latest' =
+			VAR ReportMonth = CALCULATE([Analysis Latest Month], REMOVEFILTERS(MonthlySnapshots[DPD Category]))
+			RETURN IF(ISBLANK(ReportMonth), BLANK(), CALCULATE([Total EAD], MonthlySnapshots[month] = ReportMonth))
+		formatString: #,0.00
+		lineageTag: 76f3ac11-0c08-4b40-ac49-f64900000002
+
+	/// Share of latest-month portfolio exposure for each presentation category.
+	measure 'EAD Share by DPD Category | Latest' = DIVIDE([EAD by DPD Category | Latest], CALCULATE([EAD by DPD Category | Latest], REMOVEFILTERS(MonthlySnapshots[DPD Category]), REMOVEFILTERS(MonthlySnapshots[dpd_bucket])))
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 76f3ac11-0c08-4b40-ac49-f64900000003
+
+	/// Only the three delinquent categories; the tooltip provides portfolio share.
+	measure 'Delinquent EAD by Category | Latest' =
+			VAR BucketName = SELECTEDVALUE(MonthlySnapshots[DPD Category])
+			RETURN IF(BucketName IN {"30-59 DPD", "60-89 DPD", "90+ DPD"}, [EAD by DPD Category | Latest], BLANK())
+		formatString: #,0.00
+		lineageTag: 76f3ac11-0c08-4b40-ac49-f64900000004
+
+	column loan_id
+		dataType: int64
+		formatString: 0
+		lineageTag: a1307721-8c97-460e-b2da-57e8644d3abf
+		summarizeBy: none
+		sourceColumn: loan_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c6698fe1-a0c7-4e8d-9a3f-50324c871cee
+		summarizeBy: none
+		sourceColumn: month
+
+		variation Variation
+			isDefault
+			relationship: 62b1f818-91ee-486f-a5e6-f373cfa1482a
+			defaultHierarchy: LocalDateTable_7d3bc0f8-0c18-4314-9795-036b3084434b.Datumhierarki
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ead
+		dataType: double
+		lineageTag: 641e3954-f582-424c-aee3-19a100f36963
+		summarizeBy: sum
+		sourceColumn: ead
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dpd
+		dataType: int64
+		formatString: 0
+		lineageTag: d50eeef0-da2b-4c77-bc1d-4607f41e3018
+		summarizeBy: sum
+		sourceColumn: dpd
+
+		annotation SummarizationSetBy = Automatic
+
+	column dpd_bucket
+		dataType: string
+		lineageTag: 64e53ac2-1a5d-4901-921a-244d45cfb60b
+		summarizeBy: none
+		sourceColumn: dpd_bucket
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Display labels only; source categories and individual DPD values are unchanged.
+	column 'DPD Category' = SWITCH(MonthlySnapshots[dpd_bucket], "Current", "0 DPD", "30-59", "30-59 DPD", "60-89", "60-89 DPD", "90+", "90+ DPD", "Other / invalid")
+		dataType: string
+		lineageTag: 76f3ac11-0c08-4b40-ac49-f64900000005
+		summarizeBy: none
+
+	partition MonthlySnapshots = m
+		mode: import
+		source =
+				let
+				    Källa = Csv.Document(File.Contents(Text.TrimEnd(DataFolderPath, {"\", "/"}) & "\monthly_snapshots_synthetic.csv"),[Delimiter=",", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Upphöjda rubriker" = Table.PromoteHeaders(Källa, [PromoteAllScalars=true]),
+				    #"Ändrad typ" = Table.TransformColumnTypes(#"Upphöjda rubriker",{{"loan_id", Int64.Type}, {"month", type date}, {"ead", type text}, {"dpd", Int64.Type}, {"dpd_bucket", type text}}),
+				    #"Ändrad typ med nationella inställningar" = Table.TransformColumnTypes(#"Ändrad typ", {{"ead", type number}}, "en-US")
+				in
+				    #"Ändrad typ med nationella inställningar"
+
+	annotation PBI_NavigationStepName = Navigering
+
+	annotation PBI_ResultType = Table
+

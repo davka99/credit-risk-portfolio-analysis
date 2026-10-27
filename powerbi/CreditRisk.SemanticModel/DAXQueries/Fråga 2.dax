@@ -1,0 +1,13 @@
+DEFINE
+    MEASURE MonthlySnapshots[Total EAD] =
+        SUM(MonthlySnapshots[ead])
+
+EVALUATE
+ROW(
+    "Period", "December 2025",
+    "Total EAD",
+        CALCULATE(
+            [Total EAD],
+            MonthlySnapshots[month] = DATE(2025, 12, 1)
+        )
+)

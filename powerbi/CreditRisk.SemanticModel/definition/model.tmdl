@@ -1,0 +1,23 @@
+model Model
+	culture: sv-SE
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: sv-SE
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Loans","MonthlySnapshots","DataFolderPath"]
+
+annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
+
+ref table Loans
+ref table DateTableTemplate_3066328a-a62e-4a39-87a9-7c579ac03517
+ref table LocalDateTable_0d11771b-42ed-4301-a77c-9def92ee4696
+ref table MonthlySnapshots
+ref table LocalDateTable_7d3bc0f8-0c18-4314-9795-036b3084434b
+
+ref cultureInfo sv-SE
+
