@@ -6,4 +6,4 @@
 4. Check both report pages, December reference KPIs, cross-filters and bucket totals. The report uses the registered Financial Risk theme; the reusable original is `themes/financial-risk.json`.
 5. For DAX comparison, follow `../docs/VALIDATION.md`. DAX queries under `reconciliation/` run against model measures and do not define replacement measures.
 
-This setup is designed for portability by changing one parameter. It has not yet been verified by opening the sanitized publication folder in Power BI Desktop. Paths are not automatically relative to PBIP.
+This setup is designed for portability by changing one parameter; paths are not automatically relative to PBIP. The user verified opening, refresh, both report pages, segment and product filters, latest-month behavior and six representative DAX checks in a preconfigured test copy made from a clean GitHub clone. The parameter was configured before Desktop was opened; manually replacing the placeholder in the original clean clone has not been separately verified. Broader validation of every filter and visual remains outstanding.

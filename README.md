@@ -8,9 +8,13 @@ A reproducible synthetic credit-portfolio monitoring project for exploring expos
 
 ![Preview of the existing HTML dashboard](assets/dashboard_preview.png)
 
-## Business question
+## Executive Summary
 
-A portfolio team needs to understand how exposure and overdue accounts evolve, which simulated risk segments warrant investigation, and where severe delinquency is concentrated. The report supports monitoring and discussion; it does not establish causality or recommend an underwriting decision.
+A portfolio team needs to monitor how exposure and overdue balances evolve, identify simulated segments that warrant investigation, and understand where severe delinquency is concentrated. The project supports consistent portfolio monitoring and informed discussion using entirely synthetic data.
+
+In December 2025, simulated exposure (EAD proxy) was approximately **155.99 million**, with **7.55%** at 30+ days past due and **3.41%** at 90+ days past due. The illustrative loss proxy was approximately **3.43 million**; it is not IFRS 9 ECL.
+
+The exposure-weighted 30+ delinquency rate was approximately **23.80% for Subprime**, **8.31% for Near-prime**, and **2.91% for Prime**. These differences flag areas for closer monitoring, not causal conclusions. A portfolio team could investigate segment and product mix, examine monthly movements, and review the simulation assumptions before drawing further conclusions. Findings from this synthetic case study do not establish real-world outcomes or support underwriting decisions.
 
 ## Data and model
 
@@ -77,13 +81,16 @@ To regenerate the synthetic data, SQLite, KPI reports and HTML dashboard:
 3. Apply the change, grant local file access if prompted, and refresh. Both CSVs must be in that folder with their original names.
 4. Verify that both pages load, filters work, the portfolio exposure card and bucket totals agree, and the latest-month/previous-month behavior matches the definitions above. Project cache and per-user settings are intentionally excluded; a fresh project opens without cached data until refresh.
 
-See [Power BI setup and limitations](powerbi/BUILD_GUIDE.md). A successful Desktop open and refresh on a fresh clone remains an external verification item.
+See [Power BI setup and limitations](powerbi/BUILD_GUIDE.md). The user verified opening and refresh in a preconfigured test copy made from a clean GitHub clone. Manually replacing the placeholder in the original clone has not been separately verified.
 
 ## Quality assurance
 
-`pytest` tests the generator, data contracts, reference calculations and report structure. The included Python comparator accepts exported DAX results from the actual model; it does not evaluate DAX by itself. Previous actual-model exports were reconciled for 12 months and 36 month–segment combinations across four original measures, with one documented BLANK handled conditionally. They are not included as source files; obtain fresh exports from the model for a new run. The newer presentation measures and the final styling still require fresh Desktop validation.
+- **37 Python tests passed** in the documented isolated environment, covering the generator, data contracts, reference calculations and report structure.
+- In an earlier verification, **192 original KPI values** from actual Power BI exports were reconciled against Python across 12 months and 36 month–segment combinations for four original measures, using the documented conditional BLANK rule. This reconciliation was not rerun in the new clean clone.
+- In a preconfigured test copy made from a clean GitHub clone, the user verified that the PBIP opened, refresh succeeded, both pages loaded, segment and product filters worked, and multiple-month selection used the latest month without summing exposures. All **6 of 6 representative DAX checks** passed in Power BI Desktop.
+- A broader, complete validation of every measure, filter combination and visual has not been performed. Manual configuration of the placeholder in the original clean clone remains unverified.
 
-See [validation instructions](docs/VALIDATION.md). Never present a static model check or simulated export test as an actual Power BI DAX run.
+The Python comparator reads exported actual-model DAX results; it does not evaluate DAX itself. The original exports are not included as source files; obtain fresh exports for a new reconciliation. See [validation instructions](docs/VALIDATION.md) for the BLANK rule, tolerances and reproducible checks. Static model checks and simulated export tests are not actual DAX execution.
 
 ## Technology
 
