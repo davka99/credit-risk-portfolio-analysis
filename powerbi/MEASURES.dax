@@ -1,0 +1,6 @@
+// Names of tables assume exactly: Loans and MonthlySnapshots.
+Total EAD = SUM(MonthlySnapshots[ead])
+DPD 30+ EAD = CALCULATE([Total EAD], MonthlySnapshots[dpd] >= 30)
+DPD 30+ Rate = DIVIDE([DPD 30+ EAD], [Total EAD])
+ECL Proxy = SUMX(MonthlySnapshots, MonthlySnapshots[ead] * RELATED(Loans[pd_12m_assumed]) * RELATED(Loans[lgd_assumed]))
+// ECL Proxy is illustrative; it is not an IFRS 9-compliant ECL measure.

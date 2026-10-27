@@ -1,0 +1,2 @@
+# Synthetic data
+The data in this directory is **fully synthetic** and generated from `src/pipeline.py` with NumPy seed `990903`. It is not actual borrower information. `loans_synthetic.csv` has one row per loan; `monthly_snapshots_synthetic.csv` has one row per loan per month. The SQLite copy is generated for SQL practice. Variables describe hypothetical monthly portfolio exposures and delinquency states; they do not represent repayment records or regulatory accounting.
