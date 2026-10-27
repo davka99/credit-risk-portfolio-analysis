@@ -1,0 +1,319 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "583045b7d52f6f300001",
+  "position": {
+    "x": 9.8159509202453989,
+    "y": 398.52760736196319,
+    "z": 2001,
+    "height": 569.32515337423308,
+    "width": 926.62576687116564,
+    "tabOrder": 2001
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MonthlySnapshots"
+                    }
+                  },
+                  "Property": "month"
+                }
+              },
+              "queryRef": "MonthlySnapshots.month",
+              "nativeQueryRef": "Month",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MonthlySnapshots"
+                    }
+                  },
+                  "Property": "DPD 30+ Rate"
+                }
+              },
+              "queryRef": "MonthlySnapshots.DPD 30+ Rate",
+              "nativeQueryRef": "DPD 30+ Rate",
+              "displayName": "30+ delinquency"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MonthlySnapshots"
+                    }
+                  },
+                  "Property": "DPD 90+ Rate | Presentation"
+                }
+              },
+              "queryRef": "MonthlySnapshots.DPD 90+ Rate | Presentation",
+              "nativeQueryRef": "90+ DPD rate",
+              "displayName": "90+ delinquency"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Exposure-weighted delinquency | 2025'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Share of exposure at least 30 or 90 days overdue'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "labels": [
+        {
+          "properties": {
+            "labelPrecision": {
+              "expr": {
+                "Literal": {
+                  "Value": "2L"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "labelPrecision": {
+              "expr": {
+                "Literal": {
+                  "Value": "2L"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "6b47fa544765fede6fab",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "MonthlySnapshots"
+              }
+            },
+            "Property": "month"
+          }
+        },
+        "type": "Categorical",
+        "howCreated": "User",
+        "objects": {
+          "general": [
+            {
+              "properties": {
+                "isInvertedSelectionMode": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "true"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "40329959d4aff90c2599",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "MonthlySnapshots"
+              }
+            },
+            "Property": "DPD 30+ Rate"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "3c5be1e24dd0a24c5826",
+        "field": {
+          "HierarchyLevel": {
+            "Expression": {
+              "Hierarchy": {
+                "Expression": {
+                  "PropertyVariationSource": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "MonthlySnapshots"
+                      }
+                    },
+                    "Name": "Variation",
+                    "Property": "month"
+                  }
+                },
+                "Hierarchy": "Datumhierarki"
+              }
+            },
+            "Level": "År"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "8d20aa249e02788b2ca4",
+        "field": {
+          "HierarchyLevel": {
+            "Expression": {
+              "Hierarchy": {
+                "Expression": {
+                  "PropertyVariationSource": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "MonthlySnapshots"
+                      }
+                    },
+                    "Name": "Variation",
+                    "Property": "month"
+                  }
+                },
+                "Hierarchy": "Datumhierarki"
+              }
+            },
+            "Level": "Kvartal"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "00f810c1505dc470256f",
+        "field": {
+          "HierarchyLevel": {
+            "Expression": {
+              "Hierarchy": {
+                "Expression": {
+                  "PropertyVariationSource": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "MonthlySnapshots"
+                      }
+                    },
+                    "Name": "Variation",
+                    "Property": "month"
+                  }
+                },
+                "Hierarchy": "Datumhierarki"
+              }
+            },
+            "Level": "Månad"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "39c8eaa3f11575b20110",
+        "field": {
+          "HierarchyLevel": {
+            "Expression": {
+              "Hierarchy": {
+                "Expression": {
+                  "PropertyVariationSource": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "MonthlySnapshots"
+                      }
+                    },
+                    "Name": "Variation",
+                    "Property": "month"
+                  }
+                },
+                "Hierarchy": "Datumhierarki"
+              }
+            },
+            "Level": "Dag"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "2cdd6254572641c23218",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "MonthlySnapshots"
+              }
+            },
+            "Property": "DPD 90+ Rate"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

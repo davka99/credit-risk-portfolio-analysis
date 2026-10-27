@@ -1,0 +1,48 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "aab58c74379efe4f17f9",
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 2003,
+    "height": 101.10429447852761,
+    "width": 1200,
+    "tabOrder": 2003
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Credit Risk | Executive Overview",
+                    "textStyle": {
+                      "fontSize": "24pt",
+                      "color": "#182B42"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Synthetic loan portfolio | Snapshot: December 2025",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

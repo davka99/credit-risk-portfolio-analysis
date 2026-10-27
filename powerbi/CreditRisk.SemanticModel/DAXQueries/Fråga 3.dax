@@ -1,0 +1,33 @@
+DEFINE
+    MEASURE MonthlySnapshots[Total EAD] =
+        SUM(MonthlySnapshots[ead])
+
+    MEASURE MonthlySnapshots[DPD 30+ EAD] =
+        CALCULATE(
+            [Total EAD],
+            MonthlySnapshots[dpd] >= 30
+        )
+
+    MEASURE MonthlySnapshots[DPD 90+ EAD] =
+        CALCULATE(
+            [Total EAD],
+            MonthlySnapshots[dpd] >= 90
+        )
+
+    MEASURE MonthlySnapshots[DPD 30+ Rate] =
+        DIVIDE([DPD 30+ EAD], [Total EAD])
+
+    MEASURE MonthlySnapshots[DPD 90+ Rate] =
+        DIVIDE([DPD 90+ EAD], [Total EAD])
+
+EVALUATE
+CALCULATETABLE(
+    ROW(
+        "Total EAD", [Total EAD],
+        "30+ DPD EAD", [DPD 30+ EAD],
+        "30+ DPD Rate (%)", [DPD 30+ Rate] * 100,
+        "90+ DPD EAD", [DPD 90+ EAD],
+        "90+ DPD Rate (%)", [DPD 90+ Rate] * 100
+    ),
+    MonthlySnapshots[month] = DATE(2025, 12, 1)
+)

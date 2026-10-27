@@ -1,0 +1,100 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "529bc9848ce92f8a62a2",
+  "position": {
+    "x": 1530,
+    "y": 220,
+    "z": 24,
+    "height": 160,
+    "width": 355,
+    "tabOrder": 24
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MonthlySnapshots"
+                    }
+                  },
+                  "Property": "DPD 30+ Change MoM pp"
+                }
+              },
+              "queryRef": "MonthlySnapshots.DPD 30+ Change MoM pp",
+              "nativeQueryRef": "30+ change vs prior month (pp)"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'30+ change vs previous month (pp)'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "value": [
+        {
+          "properties": {
+            "labelPrecision": {
+              "expr": {
+                "Literal": {
+                  "Value": "2L"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "9c60dcddc5f89ce01436",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "MonthlySnapshots"
+              }
+            },
+            "Property": "DPD 30+ Change MoM pp"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

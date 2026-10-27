@@ -1,0 +1,11 @@
+EVALUATE
+CALCULATETABLE(
+    SUMMARIZECOLUMNS(
+        Loans[segment],
+        "Total EAD", [Total EAD],
+        "30+ DPD Rate (%)", [DPD 30+ Rate] * 100,
+        "ECL Proxy", [ECL Proxy]
+    ),
+    MonthlySnapshots[month] = DATE(2025, 12, 1)
+)
+ORDER BY Loans[segment]

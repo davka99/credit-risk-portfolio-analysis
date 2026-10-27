@@ -3,8 +3,6 @@ from pathlib import Path
 import sqlite3
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / 'data'
@@ -81,6 +79,8 @@ def analyze(accounts,snapshots):
 
 
 def make_dashboard(monthly, segments,roll, latest):
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
     navy='#182B42'; blue='#316B9B'; orange='#D38B52'; ink='#182B42'; gray='#64748B'
     last=monthly.iloc[-1]
     headline=(f"{last.exposure/1e6:,.1f}M",f"{last.dq30_pct:.1f}%",f"{last.illustrative_ecl/1e6:,.2f}M")

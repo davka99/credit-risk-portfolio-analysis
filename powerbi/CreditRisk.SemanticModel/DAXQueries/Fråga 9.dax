@@ -1,0 +1,10 @@
+EVALUATE
+CALCULATETABLE(
+    ROW(
+        "Is Blank", ISBLANK([DPD 90+ Rate]),
+        "90+ EAD", [DPD 90+ EAD],
+        "Total EAD", [Total EAD]
+    ),
+    MonthlySnapshots[month] = DATE(2025, 1, 1),
+    Loans[segment] = "Subprime"
+)

@@ -1,10 +1,9 @@
-# Power BI implementation guide (not a verified PBIX)
+# Power BI Desktop setup
 
-1. Open Power BI Desktop → Get data → Text/CSV. Import `data/loans_synthetic.csv` and `data/monthly_snapshots_synthetic.csv`.
-2. Set `loan_id` integer in both tables, `ead` decimal, `dpd` whole number, `pd_12m_assumed` and `lgd_assumed` decimal. Convert `month` (YYYY-MM) to a proper first-of-month Date in Power Query.
-3. Model: **Loans (1) → (*) MonthlySnapshots** on `loan_id` with single-direction filtering; do not relate on `month` alone.
-4. Use a separate calendar date dimension for more advanced time analysis.
-5. Add measures from `MEASURES.dax` and make a risk dashboard: 3 KPI cards, monthly trend, segment bar, bucket distribution. Use a white background, restrained navy/blue/orange accents, and explicit dates.
-6. Confirm cards and totals match the Python CSV outputs before presenting the report. The DAX is a reference implementation and has not been tested in Power BI Desktop here.
+1. Open `CreditRisk.pbip` in Power BI Desktop; keep both sibling report and semantic-model folders intact.
+2. Open **Transform data → Manage parameters**. Replace `DataFolderPath`'s `SET_DATA_FOLDER_PATH` placeholder with the absolute path to this clone's `data` folder. Do not include a CSV filename. The queries allow a trailing slash or backslash.
+3. Apply changes, approve local source access if prompted, then refresh. Confirm 1,600 loans and 19,200 monthly snapshots. Initial opening can be empty until refresh because local `.pbi/cache.abf` is excluded.
+4. Check both report pages, December reference KPIs, cross-filters and bucket totals. The report uses the registered Financial Risk theme; the reusable original is `themes/financial-risk.json`.
+5. For DAX comparison, follow `../docs/VALIDATION.md`. DAX queries under `reconciliation/` run against model measures and do not define replacement measures.
 
-**Never present this as a ready-made tested `.pbix` file.**
+This setup is designed for portability by changing one parameter; paths are not automatically relative to PBIP. The user verified opening, refresh, both report pages, segment and product filters, latest-month behavior and six representative DAX checks in a preconfigured test copy made from a clean GitHub clone. The parameter was configured before Desktop was opened; manually replacing the placeholder in the original clean clone has not been separately verified. Broader validation of every filter and visual remains outstanding.

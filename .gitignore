@@ -1,0 +1,22 @@
+# Python environments, caches and local test artifacts
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+# Local Power BI data cache and user-specific settings
+**/.pbi/cache.abf
+**/.pbi/localSettings.json
+**/.pbi/editorSettings.json
+**/.pbi/unappliedChanges.json
+# Local DAX exports and secrets
+*.tsv
+*.tsv.txt
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
