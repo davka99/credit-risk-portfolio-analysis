@@ -16,6 +16,14 @@ In December 2025, simulated exposure (EAD proxy) was approximately **155.99 mill
 
 The exposure-weighted 30+ delinquency rate was approximately **23.80% for Subprime**, **8.31% for Near-prime**, and **2.91% for Prime**. These differences flag areas for closer monitoring, not causal conclusions. A portfolio team could investigate segment and product mix, examine monthly movements, and review the simulation assumptions before drawing further conclusions. Findings from this synthetic case study do not establish real-world outcomes or support underwriting decisions.
 
+**Executive Overview** — December portfolio exposure and delinquency.
+
+![Power BI Executive Overview](assets/powerbi-executive-overview.png)
+
+**Delinquency & Portfolio Analysis** — trends, risk segments and exposure mix.
+
+![Power BI Delinquency and Portfolio Analysis](assets/powerbi-delinquency-analysis.png)
+
 ## Data and model
 
 The dataset contains 1,600 synthetic loans and 19,200 monthly observations for January–December 2025. `Loans` has one row per loan; `MonthlySnapshots` has one row per loan per month. A single-direction one-to-many relationship on `loan_id` links the dimension to snapshots. Month-end balances are snapshots, so summing across months is not a single-month exposure.
@@ -46,14 +54,6 @@ The existing CSVs are synthetic, reproducible inputs. The pipeline also writes a
 - **Delinquency & Portfolio Analysis:** month, segment and product filters; latest-selected-month snapshot cards; change against the prior calendar month; selected-month trend; exposure mix and delinquent-bucket comparison. Cards and distributions use the latest month within the selection, rather than summing balances across months.
 
 The Power BI project is stored as PBIP with PBIR report definitions and TMDL semantic-model definitions. The custom JSON theme is under `powerbi/themes/`; a registered copy is included with the report. The opening preview shows the HTML dashboard.
-
-**Executive Overview** — December portfolio exposure and delinquency.
-
-![Power BI Executive Overview](assets/powerbi-executive-overview.png)
-
-**Delinquency & Portfolio Analysis** — trends, risk segments and exposure mix.
-
-![Power BI Delinquency and Portfolio Analysis](assets/powerbi-delinquency-analysis.png)
 
 ## Python setup and reproduction
 
