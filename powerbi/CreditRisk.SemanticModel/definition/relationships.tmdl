@@ -1,0 +1,14 @@
+relationship d3cbad5f-828c-4196-9fdd-e4f4892fcfd7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Loans.origination_date
+	toColumn: LocalDateTable_0d11771b-42ed-4301-a77c-9def92ee4696.Date
+
+relationship 62b1f818-91ee-486f-a5e6-f373cfa1482a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: MonthlySnapshots.month
+	toColumn: LocalDateTable_7d3bc0f8-0c18-4314-9795-036b3084434b.Date
+
+relationship AutoDetected_74c77309-3aa3-4c71-9ab7-ce484a38001c
+	fromColumn: MonthlySnapshots.loan_id
+	toColumn: Loans.loan_id
+

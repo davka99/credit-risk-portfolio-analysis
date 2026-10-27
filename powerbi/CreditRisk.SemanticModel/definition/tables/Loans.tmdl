@@ -1,0 +1,108 @@
+table Loans
+	lineageTag: 9582bb9c-e908-4682-b84a-6bb7953fb9ec
+
+	measure 'Loan Rows' = COUNTROWS(Loans)
+		formatString: 0
+		lineageTag: 817c814e-fd95-48a4-8caa-6342cffea398
+
+	measure 'Snapshot Rows' = COUNTROWS(MonthlySnapshots)
+		formatString: 0
+		lineageTag: 127e97a8-cc3f-44a9-95ce-fe1aa9ff5efb
+
+	measure 'Loan Rows Display' =
+			
+			FORMAT(
+			    [Loan Rows],
+			    "#,##0",
+			    "sv-SE"
+			)
+		lineageTag: a82a3e6d-665f-4e5e-a5ad-f2edd97c6d8e
+
+	column loan_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 47ad0d9a-e323-4a85-a67d-16bd1da1a2e7
+		summarizeBy: none
+		sourceColumn: loan_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column segment
+		dataType: string
+		lineageTag: 59917729-6317-4cd4-b89c-16e14fab47bb
+		summarizeBy: none
+		sourceColumn: segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column product
+		dataType: string
+		lineageTag: 94d47b7a-c46f-4c4f-ad01-8de7ef85d33c
+		summarizeBy: none
+		sourceColumn: product
+
+		annotation SummarizationSetBy = Automatic
+
+	column origination_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: eff7a506-c3d9-4412-afed-5f7739da8b25
+		summarizeBy: none
+		sourceColumn: origination_date
+
+		variation Variation
+			isDefault
+			relationship: d3cbad5f-828c-4196-9fdd-e4f4892fcfd7
+			defaultHierarchy: LocalDateTable_0d11771b-42ed-4301-a77c-9def92ee4696.Datumhierarki
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column opening_balance
+		dataType: double
+		lineageTag: 081ec692-149d-4f91-9a13-d8ec4562849d
+		summarizeBy: sum
+		sourceColumn: opening_balance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column pd_12m_assumed
+		dataType: double
+		lineageTag: 07d519af-b92e-4184-9676-d22bc8c463a5
+		summarizeBy: sum
+		sourceColumn: pd_12m_assumed
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column lgd_assumed
+		dataType: double
+		lineageTag: bee48b42-d88f-47ec-abf8-825cbc86027d
+		summarizeBy: sum
+		sourceColumn: lgd_assumed
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Loans = m
+		mode: import
+		source =
+				let
+				    Källa = Csv.Document(File.Contents(Text.TrimEnd(DataFolderPath, {"\", "/"}) & "\loans_synthetic.csv"),[Delimiter=",", Columns=7, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Upphöjda rubriker" = Table.PromoteHeaders(Källa, [PromoteAllScalars=true]),
+				    #"Ändrad typ" = Table.TransformColumnTypes(#"Upphöjda rubriker",{{"loan_id", Int64.Type}, {"segment", type text}, {"product", type text}, {"origination_date", type date}, {"opening_balance", type text}, {"pd_12m_assumed", type text}, {"lgd_assumed", type text}}),
+				    #"Ändrad typ med nationella inställningar" = Table.TransformColumnTypes(#"Ändrad typ", {{"opening_balance", type number}}, "en-US"),
+				    #"Ändrad typ med nationella inställningar1" = Table.TransformColumnTypes(#"Ändrad typ med nationella inställningar", {{"pd_12m_assumed", type number}}, "en-US"),
+				    #"Ändrad typ med nationella inställningar2" = Table.TransformColumnTypes(#"Ändrad typ med nationella inställningar1", {{"lgd_assumed", type number}}, "en-US")
+				in
+				    #"Ändrad typ med nationella inställningar2"
+
+	annotation PBI_NavigationStepName = Navigering
+
+	annotation PBI_ResultType = Table
+

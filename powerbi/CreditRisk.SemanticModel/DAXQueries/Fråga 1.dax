@@ -1,0 +1,9 @@
+// Välkommen till DAX-frågevyn! Läs mer om DAX-frågor på https://aka.ms/dax-queries.
+// Högerklicka i tabeller, kolumner eller mått i datarutan och få tillgång till snabbfrågor, eller be Copilot om hjälp med att skriva DAX.
+EVALUATE
+ROW(
+    "Loan Rows", [Loan Rows],
+    "Snapshot Rows", [Snapshot Rows],
+    "Loan Rows Display", FORMAT([Loan Rows], "#,##0", "sv-SE"),
+    "Snapshot Rows Display", FORMAT([Snapshot Rows], "#,##0", "sv-SE")
+)

@@ -1,0 +1,13 @@
+{
+  "name": "Financial Risk",
+  "dataColors": [
+    "#182B42",
+    "#316B9B",
+    "#D38B52"
+  ],
+  "background": "#F3F6FA",
+  "foreground": "#182B42",
+  "firstLevelElements": "#182B42",
+  "secondLevelElements": "#64748B",
+  "tableAccent": "#316B9B"
+}

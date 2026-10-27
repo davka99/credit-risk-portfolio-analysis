@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "a42de11a9ce045d7b912",
+  "displayName": "Delinquency & Portfolio Analysis",
+  "displayOption": "FitToPage",
+  "height": 1080,
+  "width": 1920
+}

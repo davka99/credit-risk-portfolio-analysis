@@ -1,0 +1,81 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "c0000000000000000001",
+  "position": {
+    "x": 946,
+    "y": 720,
+    "z": 2100,
+    "height": 290,
+    "width": 925,
+    "tabOrder": 2100
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "QUICK DEFINITIONS",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#182B42"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "EAD: simulated month-end balance, not regulatory exposure. DPD: days past due.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "30+ / 90+: exposure share at least 30 / 90 days late; higher shares flag risk for review.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Prime / Near-prime / Subprime: lower / mid / higher assumed PD baselines.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Loss proxy: EAD × assumed default probability (PD) × assumed loss given default (LGD); not IFRS 9.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#64748B"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

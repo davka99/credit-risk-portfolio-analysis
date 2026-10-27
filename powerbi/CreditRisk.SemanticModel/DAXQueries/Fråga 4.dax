@@ -1,0 +1,17 @@
+DEFINE
+    MEASURE MonthlySnapshots[ECL Proxy] =
+        SUMX(
+            MonthlySnapshots,
+            MonthlySnapshots[ead]
+                * RELATED(Loans[pd_12m_assumed])
+                * RELATED(Loans[lgd_assumed])
+        )
+
+EVALUATE
+CALCULATETABLE(
+    ROW(
+        "Period", "December 2025",
+        "ECL Proxy", [ECL Proxy]
+    ),
+    MonthlySnapshots[month] = DATE(2025, 12, 1)
+)
