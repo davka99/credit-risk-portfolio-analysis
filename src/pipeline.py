@@ -29,14 +29,16 @@ def generate(n=1600, months=12):
         # 30+ delinquency probabilities respond to credit quality and a mild adverse environment.
         adverse = 1 + .06*m
         p_onset = np.minimum(pd_12m/3 * adverse, .4)
+        # Each loan makes at most one transition per month. Every rule reads the
+        # start-of-month state (prev), so a loan cannot pass several buckets at once.
+        prev = dpd.copy()
         u = rng.random(n)
-        dpd=np.where((dpd==0)&(u<p_onset),30,dpd)
-        u=rng.random(n)
-        dpd=np.where((dpd==30)&(u<.25),60,dpd)
-        u=rng.random(n)
-        dpd=np.where((dpd==60)&(u<.3),90,dpd)
-        u=rng.random(n)
-        dpd=np.where((dpd>0)&(u<.19),0,dpd)
+        dpd = np.where((prev == 0) & (u < p_onset), 30, prev)  # new delinquency
+        dpd = np.where((prev == 30) & (u < .25), 60, dpd)       # roll 30 -> 60
+        dpd = np.where((prev == 60) & (u < .3), 90, dpd)        # roll 60 -> 90 (default)
+        # Cure uses the top of the same draw, so it can never coincide with a roll.
+        # 90+ is default and absorbing: no rule moves a loan out of prev == 90.
+        dpd = np.where((prev > 0) & (prev < 90) & (u > 1 - .19), 0, dpd)
         # No unobserved cash flows are inferred; illustrative amortization only.
         ead=np.maximum(0,balance0 * (1-.022*m) * rng.uniform(.985,1.015,n)).round(2)
         buckets=np.select([dpd==0,dpd==30,dpd==60,dpd>=90],['Current','30-59','60-89','90+'],default='Current')
