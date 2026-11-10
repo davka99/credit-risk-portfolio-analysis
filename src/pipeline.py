@@ -24,21 +24,28 @@ def generate(n=1600, months=12):
         'origination_date':(pd.Period('2024-07',freq='M')+origination).astype(str),
         'opening_balance':balance0,'pd_12m_assumed':pd_12m.round(6),'lgd_assumed':lgd.round(6)})
     dpd = np.zeros(n,dtype=int)
+    paid = np.zeros(n,dtype=int)  # installments paid since the January 2025 opening balance
     records=[]
     for m in range(months):
         # 30+ delinquency probabilities respond to credit quality and a mild adverse environment.
         adverse = 1 + .06*m
         p_onset = np.minimum(pd_12m/3 * adverse, .4)
+        # Each loan makes at most one transition per month. Every rule reads the
+        # start-of-month state (prev), so a loan cannot pass several buckets at once.
+        prev = dpd.copy()
         u = rng.random(n)
-        dpd=np.where((dpd==0)&(u<p_onset),30,dpd)
-        u=rng.random(n)
-        dpd=np.where((dpd==30)&(u<.25),60,dpd)
-        u=rng.random(n)
-        dpd=np.where((dpd==60)&(u<.3),90,dpd)
-        u=rng.random(n)
-        dpd=np.where((dpd>0)&(u<.19),0,dpd)
-        # No unobserved cash flows are inferred; illustrative amortization only.
-        ead=np.maximum(0,balance0 * (1-.022*m) * rng.uniform(.985,1.015,n)).round(2)
+        dpd = np.where((prev == 0) & (u < p_onset), 30, prev)  # new delinquency
+        dpd = np.where((prev == 30) & (u < .25), 60, dpd)       # roll 30 -> 60
+        dpd = np.where((prev == 60) & (u < .3), 90, dpd)        # roll 60 -> 90 (default)
+        # Cure uses the top of the same draw, so it can never coincide with a roll.
+        # 90+ is default and absorbing: no rule moves a loan out of prev == 90.
+        dpd = np.where((prev > 0) & (prev < 90) & (u > 1 - .19), 0, dpd)
+        # Linear amortization of 2.2% of the opening balance per paid installment.
+        # Installments due by month m: m + 1. Each 30 DPD is one missed installment, and a
+        # cured loan has paid all arrears. Defaulted loans (90+) stop paying, so their
+        # balance is frozen at the level reached before default.
+        paid = np.where(dpd >= 90, paid, np.maximum(0, (m + 1) - dpd // 30))
+        ead=np.maximum(0,balance0 * (1-.022*paid)).round(2)
         buckets=np.select([dpd==0,dpd==30,dpd==60,dpd>=90],['Current','30-59','60-89','90+'],default='Current')
         month=str(pd.Period('2025-01',freq='M')+m)
         records.extend(zip(loan_id, [month]*n, ead, dpd, buckets))
@@ -57,7 +64,9 @@ def validate(accounts,snapshots):
 
 def analyze(accounts,snapshots):
     joined=snapshots.merge(accounts,on='loan_id',validate='many_to_one')
-    joined['ecl_12m_illustrative']=joined.ead*joined.pd_12m_assumed*joined.lgd_assumed
+    # Defaulted exposures (90+ DPD) carry PD = 1; performing loans use the assumed 12-month PD.
+    joined['pd_effective']=np.where(joined.dpd>=90,1.0,joined.pd_12m_assumed)
+    joined['ecl_12m_illustrative']=joined.ead*joined.pd_effective*joined.lgd_assumed
     joined['delinq_ead']=np.where(joined.dpd>=30,joined.ead,0)
     joined['severe_ead']=np.where(joined.dpd>=90,joined.ead,0)
     monthly=joined.groupby('month',as_index=False).agg(exposure=('ead','sum'),delinquent_ead=('delinq_ead','sum'),severe_ead=('severe_ead','sum'),illustrative_ecl=('ecl_12m_illustrative','sum'),loans=('loan_id','nunique'))
@@ -78,6 +87,29 @@ def analyze(accounts,snapshots):
     return monthly,segments,roll,latest
 
 
+def pd_backtest(accounts,snapshots):
+    """Compare the assumed 12-month PD with the observed 12-month default rate per segment.
+
+    A loan counts as defaulted if it reaches 90+ DPD at any point in the observation window.
+    All loans are current at the start of the window and observed for 12 months, so the
+    observed rate is directly comparable with a 12-month PD.
+    """
+    defaulted=snapshots.groupby('loan_id').dpd.max().ge(90).rename('defaulted')
+    joined=accounts.merge(defaulted,left_on='loan_id',right_index=True,validate='one_to_one')
+    result=joined.groupby('segment',as_index=False).agg(loans=('loan_id','count'),assumed_pd=('pd_12m_assumed','mean'),observed_default_rate=('defaulted','mean'))
+    result['observed_to_assumed']=result.observed_default_rate/result.assumed_pd
+    # 95% Wilson score interval for the observed default rate (binomial sampling noise).
+    z=1.959964; n=result.loans; p=result.observed_default_rate
+    centre=(p+z**2/(2*n))/(1+z**2/n)
+    half=z*np.sqrt(p*(1-p)/n+z**2/(4*n**2))/(1+z**2/n)
+    result['ci95_low']=centre-half
+    result['ci95_high']=centre+half
+    result['assumed_within_ci']=result.assumed_pd.between(result.ci95_low,result.ci95_high)
+    ordered=['Prime','Near-prime','Subprime']
+    result['segment']=pd.Categorical(result['segment'],ordered,ordered=True)
+    return result.sort_values('segment').reset_index(drop=True)
+
+
 def make_dashboard(monthly, segments,roll, latest):
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
@@ -95,7 +127,7 @@ def make_dashboard(monthly, segments,roll, latest):
     fig.update_yaxes(title_text='Delinquent EAD (%)',row=1,col=1);fig.update_yaxes(title_text='Exposure (M synthetic units)',row=1,col=2);fig.update_yaxes(title_text='ECL proxy (M)',row=2,col=2)
     content=fig.to_html(full_html=False,include_plotlyjs=True,config={'displaylogo':False,'responsive':True})
     metrics=''.join(f'<div class="metric"><div class="metric-label">{label}</div><div class="metric-value">{value}</div></div>' for label,value in zip(['Exposure','30+ DPD · EAD weighted','ECL proxy · not IFRS 9'],headline))
-    html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Portfolio Risk | Executive Review</title><style>body{{margin:0;background:#F3F6FA;color:#182B42;font:14px Arial,sans-serif}}.wrap{{max-width:1250px;margin:36px auto;padding:0 22px}}header{{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #DDE5EF;padding-bottom:22px}}h1{{font-size:30px;margin:8px 0;font-weight:600}}.eyebrow{{font-size:11px;letter-spacing:2px;color:#55708D;font-weight:bold}}.period{{color:#64748B}}.metrics{{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0}}.metric{{background:white;padding:24px;border:1px solid #E1E7F0;border-radius:7px}}.metric-label{{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:#66788A}}.metric-value{{font-size:32px;font-weight:600;margin-top:13px;color:#182B42}}.panel{{background:white;border:1px solid #E1E7F0;border-radius:7px;padding:6px}}.foot{{line-height:1.65;color:#576879;font-size:12px;margin-top:16px}}@media(max-width:700px){{.metrics{{grid-template-columns:1fr}}h1{{font-size:22px}}}}</style></head><body><div class="wrap"><header><div><div class="eyebrow">RISK ANALYTICS / PORTFOLIO MONITORING</div><h1>Portfolio Risk Overview</h1></div><div class="period">Synthetic portfolio · January–December 2025</div></header><div class="metrics">{metrics}</div><div class="panel">{content}</div><div class="foot"><b>Interpretation:</b> Observed synthetic 30+ DPD trends and risk-segment distribution; differences are scenario-dependent and not evidence about real lenders. <b>Definitions:</b> EAD = simulated outstanding balance. 30+ DPD = EAD share with 30 or more days past due. Roll rate = share of accounts transitioning between consecutive monthly delinquency buckets. ECL proxy = EAD × assumed 12-month PD × assumed LGD; not compliant IFRS 9 ECL. No real customer data.</div></div></body></html>'''
+    html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Portfolio Risk | Executive Review</title><style>body{{margin:0;background:#F3F6FA;color:#182B42;font:14px Arial,sans-serif}}.wrap{{max-width:1250px;margin:36px auto;padding:0 22px}}header{{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #DDE5EF;padding-bottom:22px}}h1{{font-size:30px;margin:8px 0;font-weight:600}}.eyebrow{{font-size:11px;letter-spacing:2px;color:#55708D;font-weight:bold}}.period{{color:#64748B}}.metrics{{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0}}.metric{{background:white;padding:24px;border:1px solid #E1E7F0;border-radius:7px}}.metric-label{{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:#66788A}}.metric-value{{font-size:32px;font-weight:600;margin-top:13px;color:#182B42}}.panel{{background:white;border:1px solid #E1E7F0;border-radius:7px;padding:6px}}.foot{{line-height:1.65;color:#576879;font-size:12px;margin-top:16px}}@media(max-width:700px){{.metrics{{grid-template-columns:1fr}}h1{{font-size:22px}}}}</style></head><body><div class="wrap"><header><div><div class="eyebrow">RISK ANALYTICS / PORTFOLIO MONITORING</div><h1>Portfolio Risk Overview</h1></div><div class="period">Synthetic portfolio · January–December 2025</div></header><div class="metrics">{metrics}</div><div class="panel">{content}</div><div class="foot"><b>Interpretation:</b> Observed synthetic 30+ DPD trends and risk-segment distribution; differences are scenario-dependent and not evidence about real lenders. <b>Definitions:</b> EAD = simulated outstanding balance. 30+ DPD = EAD share with 30 or more days past due. Roll rate = share of accounts transitioning between consecutive monthly delinquency buckets. ECL proxy = EAD × PD × assumed LGD, with PD = 1 for 90+ DPD and the assumed 12-month PD otherwise; not compliant IFRS 9 ECL. No real customer data.</div></div></body></html>'''
     REPORTS.mkdir(exist_ok=True)
     (REPORTS/'dashboard.html').write_text(html,encoding='utf8')
     fig.write_image(REPORTS/'dashboard_charts.png',width=1280,height=760,scale=1) if _has_kaleido() else None
@@ -118,6 +150,7 @@ def main():
     monthly.to_csv(REPORTS/'monthly_kpis.csv',index=False)
     segments.to_csv(REPORTS/'segment_kpis.csv',index=False)
     roll.to_csv(REPORTS/'roll_rates.csv')
+    pd_backtest(accounts,snapshots).to_csv(REPORTS/'pd_backtest.csv',index=False)
     make_dashboard(monthly,segments,roll,latest)
     print(f'Generated {len(accounts):,} synthetic loans and {len(snapshots):,} monthly records')
     print(f'Latest period: {monthly.month.iloc[-1]}, 30+ DPD: {monthly.dq30_pct.iloc[-1]:.2f}%, ECL proxy: {monthly.illustrative_ecl.iloc[-1]:,.0f}')

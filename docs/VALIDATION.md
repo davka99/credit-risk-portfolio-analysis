@@ -2,30 +2,48 @@
 
 ## Python tests
 
-Run `python -B -m pytest -q -p no:cacheprovider` from the project root after installing `requirements.txt`. The tests check key uniqueness, data integrity, reference calculations, Power BI JSON structure and display settings. They do not run DAX in a Power BI engine.
+Run `python -B -m pytest -q -p no:cacheprovider` from the project root after installing `requirements.txt`. The suite (51 tests, 2026-11-10) checks:
+
+- **Simulation rules:** at most one DPD bucket per month, absorbing default at 90+, no amortization on missed installments, frozen balances in default.
+- **Calculations:** the loss proxy (PD = 1 at 90+ DPD), the PD back-test and its Wilson interval, and that the SQL queries return the same results as Python.
+- **Data contracts:** unique keys, valid DPD values, non-negative balances, 12 months per loan.
+- **Reference values:** monthly and segment KPIs against `reference/`, and the December figures below.
+- **Report structure:** Power BI page and visual definitions.
+
+The tests do not run DAX in a Power BI engine.
 
 ## Reference values, December 2025
 
 | DPD bucket | Exposure | Exposure share |
 |---|---:|---:|
-| 0 DPD | 144,219,580.26 | 92.4516% |
-| 30–59 | 3,836,227.13 | 2.4592% |
-| 60–89 | 2,613,820.74 | 1.6756% |
-| 90+ | 5,325,097.36 | 3.4136% |
-| Total | 155,994,725.49 | 100.0000% |
+| 0 DPD | 135,269,882.22 | 88.2447% |
+| 30–59 | 6,319,797.39 | 4.1228% |
+| 60–89 | 3,517,781.50 | 2.2949% |
+| 90+ | 8,182,035.76 | 5.3376% |
+| Total | 153,289,496.87 | 100.0000% |
 
 Four decimal places are retained for reference; programmatic comparisons use unrounded values.
 
-## Actual Power BI DAX comparison
+## Power BI Desktop check, current data
+
+Checked on 2026-11-10 after refreshing the model on the current data. For December 2025, the report shows the same values as Python:
+
+| Measure | Value |
+|---|---:|
+| Portfolio exposure | 153.29 million |
+| 30+ DPD rate | 11.76% |
+| 90+ DPD rate | 5.34% |
+| 30+ change vs November | −0.06 pp |
+| 30+ DPD rate by segment | Prime 3.90% · Near-prime 15.40% · Subprime 32.02% |
+| Delinquent exposure 30–59 / 60–89 / 90+ | 6.32 / 3.52 / 8.18 million |
+| Loss proxy | 6.72 million |
+
+## Full DAX reconciliation
 
 1. Configure `DataFolderPath`, refresh and run `powerbi/reconciliation/monthly.dax` and `month_segment.dax` in Power BI Desktop's DAX query view.
 2. Copy each complete result grid with headers to UTF-8 tab-separated files outside version control.
 3. Run `python -B -m src.reconciliation --monthly PATH_TO_MONTHLY.tsv --month-segment PATH_TO_MONTH_SEGMENT.tsv`.
 
-The comparator checks 12 monthly and 36 month–segment rows, four original measures each; absolute tolerances are 0.01 for amounts and 1e-8 for rates. An empty 90+ result is conditionally normalized only for a month–segment with positive reference exposure, no 90+ observations, and three matching remaining metrics. This policy assumes the model and export reflect the same input data. The user previously verified the relevant January/Subprime BLANK directly in Desktop; this is reported evidence, not an automatically executed query.
+The comparator checks 12 monthly and 36 month–segment rows with four measures each (192 values); absolute tolerances are 0.01 for amounts and 1e-8 for rates. An empty 90+ result is accepted only for a month–segment with positive exposure, no 90+ observations and three matching remaining metrics.
 
-In the earlier reconciliation, 192 original KPI values from actual Power BI exports were compared with Python under this conditional BLANK policy. This 192-value reconciliation was not rerun in the subsequent clean GitHub clone. `monthly.tsv` and `month_segment.tsv` are local evidence and are intentionally excluded from the publication package.
-
-The user subsequently verified a preconfigured Desktop test copy made from a clean GitHub clone: the project opened, refresh succeeded, both pages loaded, segment and product filters worked, and selecting multiple months showed the latest month's KPI without summing month-end exposures. All six representative actual-model DAX checks in the local `QA_Desktop_Check.dax` returned PASS. This is user-reported evidence, not independent execution by the assistant. The test copy was configured before opening; manual replacement of the placeholder in the original clean clone has not been separately verified.
-
-`page2_monthly.dax` and `ux_category_check.dax` are separate prepared queries for newer measures; their full query results and comparison have not been verified in the new clone. The six representative checks do not constitute exhaustive validation of every measure, month, filter combination or visual.
+This full reconciliation passed on the previous version of the data. It has not yet been repeated on the current data; the Desktop check above covers the December figures only.

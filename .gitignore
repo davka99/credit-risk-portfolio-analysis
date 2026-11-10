@@ -11,6 +11,7 @@ htmlcov/
 **/.pbi/localSettings.json
 **/.pbi/editorSettings.json
 **/.pbi/unappliedChanges.json
+**/DAXQueries/.pbi/
 # Local DAX exports and secrets
 *.tsv
 *.tsv.txt
