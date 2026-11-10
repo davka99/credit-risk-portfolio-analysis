@@ -85,7 +85,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Segments and PD/LGD are assumed. 90+ is not validated default; the loss proxy is illustrative, not IFRS 9.",
+                    "value": "Segments and PD/LGD are assumed. 90+ is treated as default in the simulation, not a validated regulatory definition; the loss proxy is illustrative, not IFRS 9.",
                     "textStyle": {
                       "fontSize": "12pt",
                       "color": "#64748B"

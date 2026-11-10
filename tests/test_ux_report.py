@@ -20,10 +20,10 @@ def test_bucket_values_and_december_portfolio_share():
     assert (data.dpd.map(mapping)==data.dpd_bucket).all()
     assert set(data.loc[data.dpd_bucket.eq('Current'),'dpd'])=={0}
     v=snapshot_reference(months=['2025-12']);b=v['bucket_ead'];total=v['ead']
-    assert b==pytest.approx({'Current':144219580.26,'30-59':3836227.13,'60-89':2613820.74,'90+':5325097.36},abs=0.01)
+    assert b==pytest.approx({'Current':135269882.22,'30-59':6319797.39,'60-89':3517781.5,'90+':8182035.76},abs=0.01)
     assert sum(b.values())==pytest.approx(total,abs=0.01)
     assert sum(x/total for x in b.values())==pytest.approx(1,abs=1e-12)
-    assert sum(b[k] for k in ('30-59','60-89','90+'))==pytest.approx(11775145.23,abs=0.01)
+    assert sum(b[k] for k in ('30-59','60-89','90+'))==pytest.approx(18019614.65,abs=0.01)
     assert sum(b[k] for k in ('30-59','60-89','90+'))/total==pytest.approx(v['rate30'],abs=1e-12)
 
 def test_both_pages_and_standalone_column_charts():

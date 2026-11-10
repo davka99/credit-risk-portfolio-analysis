@@ -63,7 +63,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Loss proxy: EAD × assumed default probability (PD) × assumed loss given default (LGD); not IFRS 9.",
+                    "value": "Loss proxy: EAD × default probability (PD) × assumed loss given default (LGD); PD = 1 at 90+ DPD, otherwise assumed; not IFRS 9.",
                     "textStyle": {
                       "fontSize": "12pt",
                       "color": "#64748B"
