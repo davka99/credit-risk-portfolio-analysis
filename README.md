@@ -12,9 +12,9 @@ A reproducible synthetic credit-portfolio monitoring project for exploring expos
 
 A portfolio team needs to monitor how exposure and overdue balances evolve, identify simulated segments that warrant investigation, and understand where severe delinquency is concentrated. The project supports consistent portfolio monitoring and informed discussion using entirely synthetic data.
 
-In December 2025, simulated exposure (EAD proxy) was approximately **155.99 million**, with **7.55%** at 30+ days past due and **3.41%** at 90+ days past due. The illustrative loss proxy was approximately **3.43 million**; it is not IFRS 9 ECL.
+In December 2025, simulated exposure (EAD proxy) was approximately **156.01 million**, with **11.46%** at 30+ days past due and **4.75%** at 90+ days past due. The illustrative loss proxy was approximately **6.51 million**; it is not IFRS 9 ECL.
 
-The exposure-weighted 30+ delinquency rate was approximately **23.80% for Subprime**, **8.31% for Near-prime**, and **2.91% for Prime**. These differences flag areas for closer monitoring, not causal conclusions. A portfolio team could investigate segment and product mix, examine monthly movements, and review the simulation assumptions before drawing further conclusions. Findings from this synthetic case study do not establish real-world outcomes or support underwriting decisions.
+The exposure-weighted 30+ delinquency rate was approximately **27.33% for Subprime**, **15.21% for Near-prime**, and **4.79% for Prime**. These differences flag areas for closer monitoring, not causal conclusions. A portfolio team could investigate segment and product mix, examine monthly movements, and review the simulation assumptions before drawing further conclusions. Findings from this synthetic case study do not establish real-world outcomes or support underwriting decisions.
 
 **Executive Overview** — December portfolio exposure and delinquency.
 
@@ -43,7 +43,7 @@ The existing CSVs are synthetic, reproducible inputs. The pipeline also writes a
 | Exposure / EAD proxy | Simulated month-end outstanding balance; not a validated regulatory EAD. |
 | 30+ / 90+ DPD rate | Balance on loans with DPD ≥ 30 / ≥ 90 divided by total balance for the same context. |
 | 30+ month-on-month change | Latest selected month's 30+ rate minus the immediately preceding calendar month's rate, expressed in percentage points. Blank when the prior month has no positive exposure. |
-| Illustrative ECL proxy | Sum of balance × assumed 12-month PD × assumed LGD. It excludes full IFRS 9 staging, forward-looking scenarios and discounting. |
+| Illustrative ECL proxy | Sum of balance × PD × assumed LGD, where PD = 1 for defaulted exposures (90+ DPD) and the assumed 12-month PD otherwise. It excludes full IFRS 9 staging, forward-looking scenarios and discounting. |
 | Roll rate | Account-count share transitioning between consecutive recorded delinquency buckets; it is not exposure-weighted. |
 
 90+ DPD is a severe-delinquency indicator, not a validated contractual or regulatory default definition. Prime, Near-prime and Subprime are simulated segments with different assumed PD baselines; findings do not generalize to real lenders.
@@ -85,7 +85,8 @@ See [Power BI setup and limitations](powerbi/BUILD_GUIDE.md). The user verified 
 
 ## Quality assurance
 
-- **37 Python tests passed** in the documented isolated environment, covering the generator, data contracts, reference calculations and report structure.
+- **44 Python tests pass**, covering the generator, delinquency transition rules, the ECL proxy (Python and SQL), data contracts, reference calculations and report structure.
+- The Power BI checks below were made before the simulation fix and must be repeated against the regenerated data.
 - In an earlier verification, **192 original KPI values** from actual Power BI exports were reconciled against Python across 12 months and 36 month–segment combinations for four original measures, using the documented conditional BLANK rule. This reconciliation was not rerun in the new clean clone.
 - In a preconfigured test copy made from a clean GitHub clone, the user verified that the PBIP opened, refresh succeeded, both pages loaded, segment and product filters worked, and multiple-month selection used the latest month without summing exposures. All **6 of 6 representative DAX checks** passed in Power BI Desktop.
 - A broader, complete validation of every measure, filter combination and visual has not been performed. Manual configuration of the placeholder in the original clean clone remains unverified.
@@ -94,4 +95,4 @@ The Python comparator reads exported actual-model DAX results; it does not evalu
 
 ## Technology
 
-Python 3.11+, NumPy, pandas, Plotly, pytest, SQLite SQL, Power Query/M, DAX, PBIR and TMDL. Power BI Desktop is a separate installation. The initial pipeline, code and documentation used AI assistance; verification status is documented rather than inferred.
+Python 3.11+, NumPy, pandas, Plotly, pytest, SQLite SQL, Power Query/M, DAX, PBIR and TMDL. Power BI Desktop is a separate installation.

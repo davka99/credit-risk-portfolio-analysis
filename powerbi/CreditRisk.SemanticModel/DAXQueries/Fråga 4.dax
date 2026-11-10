@@ -3,7 +3,7 @@ DEFINE
         SUMX(
             MonthlySnapshots,
             MonthlySnapshots[ead]
-                * RELATED(Loans[pd_12m_assumed])
+                * IF(MonthlySnapshots[dpd] >= 90, 1, RELATED(Loans[pd_12m_assumed]))
                 * RELATED(Loans[lgd_assumed])
         )
 
