@@ -87,6 +87,29 @@ def analyze(accounts,snapshots):
     return monthly,segments,roll,latest
 
 
+def pd_backtest(accounts,snapshots):
+    """Compare the assumed 12-month PD with the observed 12-month default rate per segment.
+
+    A loan counts as defaulted if it reaches 90+ DPD at any point in the observation window.
+    All loans are current at the start of the window and observed for 12 months, so the
+    observed rate is directly comparable with a 12-month PD.
+    """
+    defaulted=snapshots.groupby('loan_id').dpd.max().ge(90).rename('defaulted')
+    joined=accounts.merge(defaulted,left_on='loan_id',right_index=True,validate='one_to_one')
+    result=joined.groupby('segment',as_index=False).agg(loans=('loan_id','count'),assumed_pd=('pd_12m_assumed','mean'),observed_default_rate=('defaulted','mean'))
+    result['observed_to_assumed']=result.observed_default_rate/result.assumed_pd
+    # 95% Wilson score interval for the observed default rate (binomial sampling noise).
+    z=1.959964; n=result.loans; p=result.observed_default_rate
+    centre=(p+z**2/(2*n))/(1+z**2/n)
+    half=z*np.sqrt(p*(1-p)/n+z**2/(4*n**2))/(1+z**2/n)
+    result['ci95_low']=centre-half
+    result['ci95_high']=centre+half
+    result['assumed_within_ci']=result.assumed_pd.between(result.ci95_low,result.ci95_high)
+    ordered=['Prime','Near-prime','Subprime']
+    result['segment']=pd.Categorical(result['segment'],ordered,ordered=True)
+    return result.sort_values('segment').reset_index(drop=True)
+
+
 def make_dashboard(monthly, segments,roll, latest):
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
@@ -127,6 +150,7 @@ def main():
     monthly.to_csv(REPORTS/'monthly_kpis.csv',index=False)
     segments.to_csv(REPORTS/'segment_kpis.csv',index=False)
     roll.to_csv(REPORTS/'roll_rates.csv')
+    pd_backtest(accounts,snapshots).to_csv(REPORTS/'pd_backtest.csv',index=False)
     make_dashboard(monthly,segments,roll,latest)
     print(f'Generated {len(accounts):,} synthetic loans and {len(snapshots):,} monthly records')
     print(f'Latest period: {monthly.month.iloc[-1]}, 30+ DPD: {monthly.dq30_pct.iloc[-1]:.2f}%, ECL proxy: {monthly.illustrative_ecl.iloc[-1]:,.0f}')
