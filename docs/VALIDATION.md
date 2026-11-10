@@ -8,17 +8,17 @@ Run `python -B -m pytest -q -p no:cacheprovider` from the project root after ins
 
 | DPD bucket | Exposure | Exposure share |
 |---|---:|---:|
-| 0 DPD | 138,140,272.66 | 88.5432% |
-| 30–59 | 7,791,840.83 | 4.9943% |
-| 60–89 | 2,671,070.35 | 1.7121% |
-| 90+ | 7,411,342.15 | 4.7504% |
-| Total | 156,014,525.99 | 100.0000% |
+| 0 DPD | 135,269,882.22 | 88.2447% |
+| 30–59 | 6,319,797.39 | 4.1228% |
+| 60–89 | 3,517,781.50 | 2.2949% |
+| 90+ | 8,182,035.76 | 5.3376% |
+| Total | 153,289,496.87 | 100.0000% |
 
 Four decimal places are retained for reference; programmatic comparisons use unrounded values.
 
 ## Actual Power BI DAX comparison
 
-**Status after the simulation fix (November 2026):** the delinquency transitions and the ECL proxy were corrected and all data was regenerated. The Power BI checks described below were made on the previous data and must be repeated against the regenerated files.
+**Status after the simulation fix (November 2026):** the delinquency transitions, the ECL proxy and the balance logic were corrected and all data was regenerated. The Power BI checks described below were made on the previous data and must be repeated against the regenerated files.
 
 
 1. Configure `DataFolderPath`, refresh and run `powerbi/reconciliation/monthly.dax` and `month_segment.dax` in Power BI Desktop's DAX query view.
