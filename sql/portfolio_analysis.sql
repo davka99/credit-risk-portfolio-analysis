@@ -25,3 +25,15 @@ SELECT l.segment,COUNT(*) AS accounts,ROUND(SUM(s.ead),2) AS ead,
                  * l.lgd_assumed),2) AS ecl_proxy
 FROM snapshots s JOIN loans l ON l.loan_id=s.loan_id
 JOIN latest x ON s.month=x.m GROUP BY l.segment ORDER BY ead DESC;
+
+-- 4. PD back-test: assumed 12-month PD vs observed 12-month default rate per segment.
+--    A loan counts as defaulted if it reaches 90+ DPD at any point in the 12-month window.
+WITH defaulted AS (
+  SELECT loan_id, MAX(CASE WHEN dpd >= 90 THEN 1 ELSE 0 END) AS defaulted
+  FROM snapshots GROUP BY loan_id
+)
+SELECT l.segment, COUNT(*) AS loans,
+       ROUND(AVG(l.pd_12m_assumed),4) AS assumed_pd,
+       ROUND(AVG(d.defaulted),4) AS observed_default_rate
+FROM loans l JOIN defaulted d ON d.loan_id = l.loan_id
+GROUP BY l.segment ORDER BY assumed_pd;
