@@ -45,4 +45,4 @@ def test_chart_subtitles_and_measure_aliases_are_business_friendly():
 
 def test_qa_table_still_retains_four_decimals():
     text=(ROOT/'docs/VALIDATION.md').read_text(encoding='utf8')
-    assert '88.5432%' in text and '4.7504%' in text
+    assert '88.2447%' in text and '5.3376%' in text

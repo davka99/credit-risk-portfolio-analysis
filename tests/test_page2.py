@@ -15,20 +15,20 @@ def test_snapshot_latest_month_and_not_multimonth_sum():
     dec=snapshot_reference(months=['2025-12'])
     assert jan['month']=='2025-01' and jan['change30_pp'] is None
     assert selected['month']=='2025-12'
-    assert selected['ead']==pytest.approx(156014525.99,abs=0.01)
+    assert selected['ead']==pytest.approx(153289496.87,abs=0.01)
     assert selected['ead']==pytest.approx(dec['ead'])
     assert selected['ead']!=pytest.approx(jan['ead']+dec['ead'])
 
 def test_mom_uses_prior_calendar_month_outside_selection():
     latest=snapshot_reference(months=['2025-12'])
-    assert latest['rate30']==pytest.approx(0.11456787896240941,abs=1e-12)
-    assert latest['rate90']==pytest.approx(0.047504180158679854,abs=1e-12)
-    assert latest['change30_pp']==pytest.approx(11.456787896240941-10.991333705601884,abs=1e-9)
+    assert latest['rate30']==pytest.approx(0.11755283315517612,abs=1e-12)
+    assert latest['rate90']==pytest.approx(0.053376362549737676,abs=1e-12)
+    assert latest['change30_pp']==pytest.approx(11.755283315517612-11.812862834877299,abs=1e-9)
     assert snapshot_reference(months=['2025-01'])['change30_pp'] is None
 
 def test_risk_segment_blank90_zero_with_positive_exposure():
     v=snapshot_reference(months=['2025-01'],segments=['Subprime'])
-    assert v['ead']==pytest.approx(26560783.35,abs=0.01)
+    assert v['ead']==pytest.approx(26009820.82,abs=0.01)
     assert v['rate90']==0
     assert v['change30_pp'] is None
 

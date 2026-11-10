@@ -24,6 +24,7 @@ def generate(n=1600, months=12):
         'origination_date':(pd.Period('2024-07',freq='M')+origination).astype(str),
         'opening_balance':balance0,'pd_12m_assumed':pd_12m.round(6),'lgd_assumed':lgd.round(6)})
     dpd = np.zeros(n,dtype=int)
+    paid = np.zeros(n,dtype=int)  # installments paid since the January 2025 opening balance
     records=[]
     for m in range(months):
         # 30+ delinquency probabilities respond to credit quality and a mild adverse environment.
@@ -39,8 +40,12 @@ def generate(n=1600, months=12):
         # Cure uses the top of the same draw, so it can never coincide with a roll.
         # 90+ is default and absorbing: no rule moves a loan out of prev == 90.
         dpd = np.where((prev > 0) & (prev < 90) & (u > 1 - .19), 0, dpd)
-        # No unobserved cash flows are inferred; illustrative amortization only.
-        ead=np.maximum(0,balance0 * (1-.022*m) * rng.uniform(.985,1.015,n)).round(2)
+        # Linear amortization of 2.2% of the opening balance per paid installment.
+        # Installments due by month m: m + 1. Each 30 DPD is one missed installment, and a
+        # cured loan has paid all arrears. Defaulted loans (90+) stop paying, so their
+        # balance is frozen at the level reached before default.
+        paid = np.where(dpd >= 90, paid, np.maximum(0, (m + 1) - dpd // 30))
+        ead=np.maximum(0,balance0 * (1-.022*paid)).round(2)
         buckets=np.select([dpd==0,dpd==30,dpd==60,dpd>=90],['Current','30-59','60-89','90+'],default='Current')
         month=str(pd.Period('2025-01',freq='M')+m)
         records.extend(zip(loan_id, [month]*n, ead, dpd, buckets))
