@@ -1,6 +1,6 @@
 # Credit Risk & Portfolio Analytics
 
-Monthly monitoring of a synthetic consumer-loan portfolio: delinquency, roll rates, an illustrative loss proxy and a PD back-test. Python generates and analyzes the data, SQL reproduces the key queries, and a Power BI project (PBIP) presents the results.
+A monthly risk review of a synthetic consumer-loan portfolio (1,600 loans, 2025) that answers three questions: how much exposure is delinquent, where the expected loss sits, and whether the default-probability (PD) assumptions held. The headline finding is that Near-prime, not Subprime, carries the largest share of the illustrative loss proxy (47% of it on 36% of exposure), while 30+ days-past-due exposure rose from 1.7% to 11.8% over the year. Python generates and analyzes the data, SQL reproduces the key queries, a Power BI project (PBIP, DAX) presents the results, and GitHub Actions runs the pytest suite.
 
 > **All borrower data and outcomes are synthetic.** This is a portfolio case study, not a production underwriting model, a validated default-rate estimate or an IFRS 9 expected-credit-loss calculation.
 
