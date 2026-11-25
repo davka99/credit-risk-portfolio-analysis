@@ -2,6 +2,8 @@
 
 A monthly risk review of a synthetic consumer-loan portfolio (1,600 loans, 2025) that answers three questions: how much exposure is delinquent, where the expected loss sits, and whether the default-probability (PD) assumptions held. The headline finding is that Near-prime, not Subprime, carries the largest share of the illustrative loss proxy (47% of it on 36% of exposure), while 30+ days-past-due exposure rose from 1.7% to 11.8% over the year. Python generates and analyzes the data, SQL reproduces the key queries, a Power BI project (PBIP, DAX) presents the results, and GitHub Actions runs the pytest suite.
 
+**In plain words:** a bank lends money to 1,600 people. Each month some of them pay late. This project tracks how much money is paid late, which customer groups the bank should worry about most, and whether the bank's own risk estimates were right. The surprise: the middle-risk group, not the riskiest one, accounts for the largest part of the expected loss, because it is much bigger.
+
 > **All borrower data and outcomes are synthetic.** This is a portfolio case study, not a production underwriting model, a validated default-rate estimate or an IFRS 9 expected-credit-loss calculation.
 
 [Interactive HTML dashboard](https://davka99.github.io/credit-risk-portfolio-analysis/reports/dashboard.html) · [Power BI setup](powerbi/BUILD_GUIDE.md) · [Validation](docs/VALIDATION.md)
@@ -16,6 +18,8 @@ A portfolio team reviews the loan book every month and needs to answer three que
 
 ## Key findings (December 2025)
 
+Amounts are in synthetic SEK.
+
 | Metric | December 2025 | January 2025 |
 |---|---:|---:|
 | Portfolio exposure (EAD proxy) | 153.29 million | 201.36 million |
@@ -28,6 +32,10 @@ A portfolio team reviews the loan book every month and needs to answer three que
 - **54% of the loss proxy comes from loans already in default**; the remaining 46% is the expected loss on performing loans.
 - **Early delinquency is still recoverable.** In a typical month, 19% of 30–59 DPD accounts cure and 26% roll to 60–89. From 60–89 DPD, 31% roll into default within one month.
 - **The PD back-test does not show a significant miscalibration.** Observed 12-month default rates versus assumed PD: Prime 2.24% vs 1.84%, Near-prime 6.88% vs 5.74%, Subprime 11.06% vs 14.67%. With 217–802 loans per segment, every assumed PD lies inside the 95% confidence interval of the observed rate.
+
+![Share of exposure and share of the loss proxy per risk segment](assets/loss_vs_exposure_by_segment.png)
+
+*How to read it: each pair of bars is one customer group. The light bar is its share of the money lent, the dark bar its share of the expected loss. Where the dark bar is longer, the group causes more loss than its size suggests.*
 
 ## Recommendation
 
@@ -50,9 +58,13 @@ Some results follow directly from the simulation design and should not be read a
 
 ![Power BI Executive Overview](assets/powerbi-executive-overview.png)
 
+*How to read it: the three cards are the December figures. The left chart shows, month by month, how large a share of the money lent is at least 30 days late (dark) and at least 90 days late (blue). The right chart shows the same 30-day share per customer group. Amounts are in millions of synthetic SEK.*
+
 **Delinquency & Portfolio Analysis** — month, segment and product filters, trends, risk segments and exposure mix.
 
 ![Power BI Delinquency and Portfolio Analysis](assets/powerbi-delinquency-analysis.png)
+
+*How to read it: the filters at the top change every chart on the page. The ring shows how the money lent splits by days late; the bars at the bottom show the late amounts in millions of synthetic SEK.*
 
 ## Data and model
 
@@ -85,7 +97,9 @@ Simulation rules (`src/pipeline.py`, seed `990903`):
 
 | Path | Content |
 |---|---|
-| `src/pipeline.py` | Data generation, validation, KPIs, roll rates, PD back-test and HTML dashboard |
+| `src/pipeline.py` | Data generation, validation, KPIs, roll rates, PD back-test and HTML dashboard (template in `src/templates/`) |
+| `src/readme_figures.py` | The README figure (share of exposure vs share of loss proxy) |
+| `docs/decisions.md` | Every simulation and method choice, with the reason |
 | `sql/portfolio_analysis.sql` | SQLite queries: monthly delinquency, roll rates, segment loss proxy, PD back-test |
 | `powerbi/` | Power BI project (PBIP with PBIR report and TMDL semantic model), DAX measures and theme |
 | `tests/` | pytest suite |
@@ -93,25 +107,34 @@ Simulation rules (`src/pipeline.py`, seed `990903`):
 
 ## How to run
 
-Requires Python 3.12. From the project root in Windows PowerShell:
+Requires Python 3.12. From the project root:
+
+**Windows (PowerShell)**
 
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider
-```
-
-To regenerate the data, SQLite database, KPI reports and HTML dashboard (overwrites the files in `data/` and `reports/`):
-
-```powershell
 .\.venv\Scripts\python.exe -m src.pipeline
 ```
+
+**macOS / Linux**
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m pytest -q -p no:cacheprovider
+python -m src.pipeline
+```
+
+`src.pipeline` regenerates the data, the SQLite database, the KPI reports and the HTML dashboard (it overwrites the files in `data/` and `reports/`). To redraw the README figure, install matplotlib and run `python -m src.readme_figures`.
 
 To open the Power BI report, open `powerbi/CreditRisk.pbip` in Power BI Desktop, set the `DataFolderPath` parameter to the absolute path of the `data` folder and refresh. See [Power BI setup](powerbi/BUILD_GUIDE.md).
 
 ## Quality assurance
 
-- **51 Python tests pass** (2026-11-10), covering delinquency transition rules, balance rules, the loss proxy and the PD back-test in both Python and SQL, data contracts, reference KPI values and report structure. GitHub Actions runs the suite on every pull request and push to `main`.
+- **52 Python tests pass** (2026-11-25), covering delinquency transition rules, balance rules, the loss proxy and the PD back-test in both Python and SQL, data contracts, reference KPI values and report structure. GitHub Actions runs the suite on every pull request and push to `main`.
 - **Power BI Desktop check** (2026-11-10): after refresh on the current data, December exposure, 30+ and 90+ rates, month-on-month change, segment rates, delinquent-bucket amounts and the loss proxy matched the Python results.
 - The full measure-by-measure reconciliation against exported DAX results is described in [Validation](docs/VALIDATION.md); it has not been repeated on the current data.
 
@@ -124,4 +147,8 @@ To open the Power BI report, open `powerbi/CreditRisk.pbip` in Power BI Desktop,
 
 ## Technology
 
-Python 3.12, NumPy, pandas, Plotly, pytest, SQLite, Power Query (M), DAX, Power BI PBIP (PBIR and TMDL), GitHub Actions.
+Python 3.12, NumPy, pandas, Plotly, matplotlib, pytest, SQLite, Power Query (M), DAX, Power BI PBIP (PBIR and TMDL), GitHub Actions.
+
+## License
+
+Code: MIT (see `LICENSE`). All data in the repository is synthetic.
