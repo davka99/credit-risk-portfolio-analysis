@@ -2,7 +2,7 @@
 
 ## Python tests
 
-Run `python -B -m pytest -q -p no:cacheprovider` from the project root after installing `requirements.txt`. The suite (51 tests, 2026-11-10) checks:
+Run `python -B -m pytest -q -p no:cacheprovider` from the project root after installing `requirements.txt`. The suite (52 tests, 2026-11-25) checks:
 
 - **Simulation rules:** at most one DPD bucket per month, absorbing default at 90+, no amortization on missed installments, frozen balances in default.
 - **Calculations:** the loss proxy (PD = 1 at 90+ DPD), the PD back-test and its Wilson interval, and that the SQL queries return the same results as Python.

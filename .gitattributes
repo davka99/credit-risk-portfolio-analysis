@@ -1,0 +1,4 @@
+# Generated files: keep them out of GitHub language statistics and collapse them in diffs
+reports/dashboard.html linguist-generated=true
+data/*.csv linguist-generated=true
+data/*.sqlite linguist-generated=true
